@@ -1,26 +1,25 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ErcotMaster } from './entities/ercot-master.entity';
+import { ErcotMasterService } from './services/ercot-master.service';
+import { ErcotMasterController } from './controllers/ercot-master.controller';
+import { getDatabaseConfig } from './config/database.config';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '.env',
+      envFilePath: '.env.prod',
     }),
-    TypeOrmModule.forRoot({
-      type: 'mssql',
-      host: process.env.DB_HOST,
-      port: parseInt(process.env.DB_PORT),
-      username: process.env.DB_USERNAME,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_DATABASE,
-      entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: true,
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: getDatabaseConfig,
+      inject: [ConfigService],
     }),
+    TypeOrmModule.forFeature([ErcotMaster]),
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [ErcotMasterController],
+  providers: [ErcotMasterService],
 })
 export class AppModule {}
