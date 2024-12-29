@@ -22,6 +22,7 @@ export class ErcotMasterService {
   public async searchAddresses(searchTerm: string): Promise<AddressSuggestion[]> {
     try {
       this.logger.debug(`Searching addresses with term: ${searchTerm}`);
+      // todo: optimize perfomance issue 
 
       const addresses = await this.ercotMasterRepository.find({
         where: {
