@@ -1,0 +1,21 @@
+FROM node:20-alpine
+
+WORKDIR /usr/src/app
+
+# Install development dependencies
+COPY package*.json ./
+RUN npm install
+
+# Copy source code
+COPY . .
+
+# Create non-root user
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nestjs -u 1001 && \
+    chown -R nestjs:nodejs /usr/src/app
+
+USER nestjs
+
+EXPOSE 3000
+
+CMD ["npm", "run", "start:dev"] 
