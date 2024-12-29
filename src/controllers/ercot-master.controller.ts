@@ -7,7 +7,7 @@ import {
   Logger 
 } from '@nestjs/common';
 import { ErcotMasterService } from '../services/ercot-master.service';
-import { AddressSearchDto } from '../dto/address-search.dto';
+import { AddressSearchDto } from '../address/dto/address-search.dto';
 import { AddressSuggestion } from '../common/types/ercot.types';
 import { LoggingInterceptor } from '../common/interceptors/logging.interceptor';
 
