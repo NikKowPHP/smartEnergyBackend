@@ -10,13 +10,18 @@ services:
       - "3000:3000"
     environment:
       - NODE_ENV=development
-    env_file:
-      - .env.dev
+      - DB_HOST=db
+      - DB_PORT=1433
+      - DB_USERNAME=sa
+      - DB_PASSWORD=YourStrong!Passw0rd
+      - DB_DATABASE=LeadGrid
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
     networks:
       - smartgrid-dev-network
+    depends_on:
+      - db
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
@@ -24,6 +29,33 @@ services:
       timeout: 5s
       retries: 3
 
+  db:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    platform: linux/amd64
+    container_name: smartgrid-db-dev
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "YourStrong!Passw0rd"
+      MSSQL_PID: "Developer"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+      - ./sql-scripts:/docker-entrypoint-initdb.d
+    networks:
+      - smartgrid-dev-network
+    healthcheck:
+      test: /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "YourStrong!Passw0rd" -Q "SELECT 1" || exit 1
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+    command: ["/opt/mssql/bin/sqlservr"]
+
 networks:
   smartgrid-dev-network:
-    driver: bridge 
+    driver: bridge
+
+volumes:
+  sqlserver_data:
+    driver: local 
