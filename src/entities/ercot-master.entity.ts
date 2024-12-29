@@ -1,20 +1,28 @@
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { IsString, IsNotEmpty } from 'class-validator';
 
 @Entity('ErcotMaster')
 export class ErcotMaster {
   @PrimaryGeneratedColumn()
-  id: number;
+  readonly id: number;
 
   @Column()
-  address: string;
+  @IsString()
+  @IsNotEmpty()
+  readonly address: string;
 
   @Column()
-  city: string;
+  @IsString()
+  @IsNotEmpty()
+  readonly city: string;
 
   @Column()
-  state: string;
+  @IsString()
+  @IsNotEmpty()
+  readonly state: string;
 
   @Column()
-  zip: string;
-
+  @IsString()
+  @IsNotEmpty()
+  readonly zip: string;
 }
