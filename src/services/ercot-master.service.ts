@@ -30,6 +30,7 @@ export class ErcotMasterService {
         },
         select: ['address', 'city', 'state', 'zip'],
         take: 10,
+        cache: true,
       });
 
       if (!addresses.length) {
