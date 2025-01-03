@@ -1,8 +1,9 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, ILike } from 'typeorm';
 import { ErcotMaster } from '../entities/ercot-master.entity';
 import { AddressSuggestion } from '../common/types/ercot.types';
+import { sanitizeInput } from '../common/utils/sanitizer';
 
 @Injectable()
 export class ErcotMasterService {
@@ -21,12 +22,18 @@ export class ErcotMasterService {
    */
   public async searchAddresses(searchTerm: string): Promise<AddressSuggestion[]> {
     try {
-      this.logger.debug(`Searching addresses with term: ${searchTerm}`);
-      // todo: optimize perfomance issue 
+      // Sanitize and validate search term
+      const sanitizedTerm = sanitizeInput(searchTerm);
+      
+      if (!sanitizedTerm || sanitizedTerm.length < 3) {
+        throw new BadRequestException('Search term must be at least 3 characters long');
+      }
+
+      this.logger.debug(`Searching addresses with sanitized term: ${sanitizedTerm}`);
 
       const addresses = await this.ercotMasterRepository.find({
         where: {
-          address: ILike(`%${searchTerm}%`),
+          address: ILike(`%${sanitizedTerm}%`),
         },
         select: ['address', 'city', 'state', 'zip'],
         take: 10,
@@ -37,8 +44,16 @@ export class ErcotMasterService {
         throw new NotFoundException('No addresses found matching the search term');
       }
 
-      this.logger.debug(`Found ${addresses.length} matching addresses`);
-      return addresses;
+      // Sanitize output data
+      const sanitizedAddresses = addresses.map(addr => ({
+        address: sanitizeInput(addr.address),
+        city: sanitizeInput(addr.city),
+        state: sanitizeInput(addr.state),
+        zip: sanitizeInput(addr.zip)
+      }));
+
+      this.logger.debug(`Found ${sanitizedAddresses.length} matching addresses`);
+      return sanitizedAddresses;
     } catch (error) {
       this.logger.error(`Error searching addresses: ${error.message}`, error.stack);
       throw error;
