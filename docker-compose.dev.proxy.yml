@@ -1,0 +1,60 @@
+version: '3.3'
+
+services:
+  api:
+    container_name: smartgrid-api-dev
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - DB_HOST=db
+      - DB_PORT=1433
+      - DB_USERNAME=sa
+      - DB_PASSWORD=YourStrong!Passw0rd
+      - DB_DATABASE=leadgrid
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    networks:
+      - smartgrid-dev-network
+    depends_on:
+      - db
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  db:
+    image: mcr.microsoft.com/azure-sql-edge:latest
+    container_name: smartgrid-db-dev
+    cap_add: 
+      - SYS_PTRACE
+    environment:
+      - ACCEPT_EULA=1
+      - MSSQL_SA_PASSWORD=YourStrong!Passw0rd
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+      - ./sql-scripts:/docker-entrypoint-initdb.d
+    networks:
+      - smartgrid-dev-network
+    healthcheck:
+      test: /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "YourStrong!Passw0rd" -Q "SELECT 1" || exit 1
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+
+networks:
+  smartgrid-dev-network:
+    driver: bridge
+
+volumes:
+  sqlserver_data:
+    driver: local 
