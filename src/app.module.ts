@@ -5,6 +5,9 @@ import { ErcotMaster } from './entities/ercot-master.entity';
 import { ErcotMasterController } from './controllers/ercot-master.controller';
 import { ErcotMasterService } from './services/ercot-master.service';
 import { getDatabaseConfig } from './config/database.config';
+import { Customer } from './entities/customer.entity';
+import { CustomerController } from './controllers/customer.controller';
+import { CustomerService } from './services/customer.service';
 
 @Module({
   imports: [
@@ -16,13 +19,13 @@ import { getDatabaseConfig } from './config/database.config';
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
         ...getDatabaseConfig(configService),
-        entities: [ErcotMaster],
+        entities: [ErcotMaster, Customer],
       }),
       inject: [ConfigService],
     }),
-    TypeOrmModule.forFeature([ErcotMaster]),
+    TypeOrmModule.forFeature([ErcotMaster, Customer]),
   ],
-  controllers: [ErcotMasterController],
-  providers: [ErcotMasterService],
+  controllers: [ErcotMasterController, CustomerController],
+  providers: [ErcotMasterService, CustomerService ],
 })
 export class AppModule {}
