@@ -5,12 +5,13 @@ import { ErcotMaster } from './entities/ercot-master.entity';
 import { ErcotMasterService } from './services/ercot-master.service';
 import { ErcotMasterController } from './controllers/ercot-master.controller';
 import { getDatabaseConfig } from './config/database.config';
+import { HealthController } from './health/health.controller';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '.env.prod',
+      envFilePath: '.env.development',
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -19,7 +20,7 @@ import { getDatabaseConfig } from './config/database.config';
     }),
     TypeOrmModule.forFeature([ErcotMaster]),
   ],
-  controllers: [ErcotMasterController],
+  controllers: [ErcotMasterController, HealthController],
   providers: [ErcotMasterService],
 })
 export class AppModule {}

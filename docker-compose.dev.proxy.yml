@@ -11,13 +11,9 @@ services:
         - HTTPS_PROXY=http://172.16.2.254:3128
     ports:
       - "3010:3000"
+    env_file:
+      - .env.development
     environment:
-      - NODE_ENV=development
-      - DB_HOST=db
-      - DB_PORT=1433
-      - DB_USERNAME=sa
-      - DB_PASSWORD=YourStrong!Passw0rd
-      - DB_DATABASE=leadgrid
       - HTTP_PROXY=http://172.16.2.254:3128
       - HTTPS_PROXY=http://172.16.2.254:3128
       - npm_config_proxy=http://172.16.2.254:3128
@@ -36,11 +32,10 @@ services:
       - db
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
-      interval: 30s
-      timeout: 5s
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3010/health"]
+      interval: 10s
+      timeout: 10s
       retries: 3
-
   db:
     image: mcr.microsoft.com/azure-sql-edge:latest
     container_name: smartgrid-db-dev
