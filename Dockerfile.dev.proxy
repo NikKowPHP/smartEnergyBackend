@@ -7,14 +7,11 @@ ENV HTTP_PROXY=$HTTP_PROXY
 ENV HTTPS_PROXY=$HTTPS_PROXY
 ENV NO_PROXY="localhost,127.0.0.1,db"
 
-# Install build dependencies
-# RUN apk add --no-cache python3 make g++
-
-# Create non-root user first
-RUN addgroup -g 1001 -S nodejs && \
-    adduser -S nestjs -u 1001
 
 WORKDIR /usr/src/app
+
+# Copy package files first
+COPY package*.json ./
 
 # Configure npm to use proxy
 RUN npm config set proxy $HTTP_PROXY && \
@@ -22,17 +19,11 @@ RUN npm config set proxy $HTTP_PROXY && \
     npm config set strict-ssl false && \
     npm config set registry https://registry.npmjs.org/
 
-# Copy package files first
-COPY package*.json ./
 
-# Install dependencies with correct order and fix permissions
-RUN npm ci && \
-    npm i -g @nestjs/cli 
+# Copy source code
+COPY . .
+RUN npm install
 
-# Copy source code and set permissions
-COPY --chown=nestjs:nodejs . .
-
-USER nestjs
 
 EXPOSE 3010
 

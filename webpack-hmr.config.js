@@ -4,10 +4,10 @@ const { RunScriptWebpackPlugin } = require('run-script-webpack-plugin');
 module.exports = function (options, webpack) {
   return {
     ...options,
-    entry: ['webpack/hot/poll?100', options.entry],
+    entry: ['webpack/hot/poll?1000', options.entry], // Increased polling interval
     externals: [
       nodeExternals({
-        allowlist: ['webpack/hot/poll?100'],
+        allowlist: ['webpack/hot/poll?1000'],
       }),
     ],
     plugins: [
@@ -19,4 +19,4 @@ module.exports = function (options, webpack) {
       new RunScriptWebpackPlugin({ name: options.output.filename }),
     ],
   };
-}; 
+};

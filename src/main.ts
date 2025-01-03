@@ -19,11 +19,21 @@ async function bootstrap() {
 
   app.useGlobalPipes(new ValidationPipe());
   
-  await app.listen(3000);
+  await app.listen(process.env.API_PORT || 3000);
   
   if (module.hot) {
     module.hot.accept();
     module.hot.dispose(() => app.close());
   }
 }
-bootstrap();
+
+// Add this check to prevent multiple bootstrap calls
+if (process.env.NODE_ENV === 'development') {
+  let isBootstrapped = false;
+  if (!isBootstrapped) {
+    bootstrap();
+    isBootstrapped = true;
+  }
+} else {
+  bootstrap();
+}
