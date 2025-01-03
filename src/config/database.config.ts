@@ -7,9 +7,20 @@ export const getDatabaseConfig = (
 ): TypeOrmModuleOptions => {
   const logger = new Logger('DatabaseConfig');
   
-  // Ensure port is parsed as number
+  const host = configService.get<string>('DB_HOST');
   const port = Number(configService.get<string>('DB_PORT'));
+  const username = configService.get<string>('DB_USERNAME');
+  const database = configService.get<string>('DB_DATABASE');
   
+  logger.log(`Attempting to connect to database with:
+    Host: ${host}
+    Port: ${port}
+    Username: ${username}
+    Database: ${database}
+    Node ENV: ${configService.get<string>('NODE_ENV')}
+  `);
+
+  // Ensure port is parsed as number
   if (isNaN(port)) {
     logger.error(`Invalid port number: ${configService.get('DB_PORT')}`);
     throw new Error('Database port must be a valid number');

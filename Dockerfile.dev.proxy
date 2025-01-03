@@ -1,35 +1,40 @@
 FROM node:20-alpine
 
-
-# Add proxy settings
+# Add proxy settings with default values
 ARG HTTP_PROXY
 ARG HTTPS_PROXY
 ENV HTTP_PROXY=$HTTP_PROXY
 ENV HTTPS_PROXY=$HTTPS_PROXY
+ENV NO_PROXY="localhost,127.0.0.1,db"
 
+# Install build dependencies
+# RUN apk add --no-cache python3 make g++
+
+# Create non-root user first
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nestjs -u 1001
 
 WORKDIR /usr/src/app
-
 
 # Configure npm to use proxy
 RUN npm config set proxy $HTTP_PROXY && \
     npm config set https-proxy $HTTPS_PROXY && \
-    npm config set registry http://registry.npmjs.org/
-    
-# Install development dependencies
+    npm config set strict-ssl false && \
+    npm config set registry https://registry.npmjs.org/
+
+# Copy package files first
 COPY package*.json ./
-RUN npm install
 
-# Copy source code
-COPY . .
+# Install dependencies with correct order and fix permissions
+RUN npm ci && \
+    npm i -g @nestjs/cli 
 
-# Create non-root user
-RUN addgroup -g 1001 -S nodejs && \
-    adduser -S nestjs -u 1001 && \
-    chown -R nestjs:nodejs /usr/src/app
+# Copy source code and set permissions
+COPY --chown=nestjs:nodejs . .
 
 USER nestjs
 
-EXPOSE 3000
+EXPOSE 3010
 
-CMD ["npm", "run", "start:dev"] 
+# Use npx to ensure local CLI is used
+CMD ["npm", "run", "start:dev"]
