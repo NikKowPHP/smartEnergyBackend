@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Customer } from '../entities/customer.entity';
 import { CreateCustomerDto } from '../customer/dto/create-customer.dto';
+import { CustomerResponseDto } from 'src/customer/dto/customer-response.dto';
 
 @Injectable()
 export class CustomerService {
@@ -19,7 +20,7 @@ export class CustomerService {
    * @returns Promise<Customer> - The created customer record
    * @throws BadRequestException if validation fails
    */
-  public async createCustomer(customerData: CreateCustomerDto): Promise<Customer> {
+  public async createCustomer(customerData: CreateCustomerDto): Promise<CustomerResponseDto> {
     try {
       this.logger.debug(`Creating customer record for: ${customerData.company_name}`);
       
@@ -27,7 +28,12 @@ export class CustomerService {
       const savedCustomer = await this.customerRepository.save(customer);
       
       this.logger.debug(`Successfully created customer with ID: ${savedCustomer.id}`);
-      return savedCustomer;
+      return {
+        success: true,
+        message: 'Customer created successfully',
+        customerId: savedCustomer.id,
+        timestamp: new Date().toISOString()
+      };
     } catch (error) {
       this.logger.error(`Error creating customer: ${error.message}`, error.stack);
       throw new BadRequestException('Failed to create customer record');
