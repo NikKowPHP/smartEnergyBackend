@@ -1,11 +1,10 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ErcotMaster } from './entities/ercot-master.entity';
-import { ErcotMasterService } from './services/ercot-master.service';
 import { ErcotMasterController } from './controllers/ercot-master.controller';
+import { ErcotMasterService } from './services/ercot-master.service';
 import { getDatabaseConfig } from './config/database.config';
-import { HealthController } from './health/health.controller';
 
 @Module({
   imports: [
@@ -15,12 +14,15 @@ import { HealthController } from './health/health.controller';
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: getDatabaseConfig,
+      useFactory: (configService: ConfigService) => ({
+        ...getDatabaseConfig(configService),
+        entities: [ErcotMaster],
+      }),
       inject: [ConfigService],
     }),
     TypeOrmModule.forFeature([ErcotMaster]),
   ],
-  controllers: [ErcotMasterController, HealthController],
+  controllers: [ErcotMasterController],
   providers: [ErcotMasterService],
 })
 export class AppModule {}

@@ -29,7 +29,7 @@ export const getDatabaseConfig = (
   const config: TypeOrmModuleOptions = {
     type: 'mssql',
     host: configService.get<string>('DB_HOST'),
-    port: port,
+    port: +configService.get('DB_PORT'),
     username: configService.get<string>('DB_USERNAME'),
     password: configService.get<string>('DB_PASSWORD'),
     database: configService.get<string>('DB_DATABASE'),
@@ -39,11 +39,11 @@ export const getDatabaseConfig = (
     options: {
       encrypt: false,
       trustServerCertificate: true,
-      enableArithAbort: true,
-      connectTimeout: 30000,
-      cancelTimeout: 30000,
-      packetSize: 4096,
-      useUTC: true,
+      // enableArithAbort: true,
+      // connectTimeout: 30000,
+      // cancelTimeout: 30000,
+      // packetSize: 4096,
+      // useUTC: true,
     },
     pool: {
       max: 10,

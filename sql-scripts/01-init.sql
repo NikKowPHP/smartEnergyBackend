@@ -5,53 +5,34 @@ GO
 USE LeadGrid;
 GO
 
--- Create ERCOTMaster table
-CREATE TABLE ERCOTMaster (
-    ID INT IDENTITY(1,1) PRIMARY KEY,
-    Address NVARCHAR(255),
-    City NVARCHAR(100),
-    State NVARCHAR(2),
-    ZipCode NVARCHAR(10),
-    ESIId NVARCHAR(50),
-    MeterType NVARCHAR(50),
-    PremiseType NVARCHAR(50)
-);
-GO
-
--- Create CustomerData table
-CREATE TABLE CustomerData (
-    ID INT IDENTITY(1,1) PRIMARY KEY,
-    Phone NVARCHAR(20),
-    Email NVARCHAR(255),
-    CompanyName NVARCHAR(255),
-    AddressStreet NVARCHAR(255),
-    AddressCity NVARCHAR(100),
-    AddressState NVARCHAR(2),
-    AddressZip NVARCHAR(10),
-    ContractEndDate DATE,
-    EnergyProvider NVARCHAR(100),
-    MonthlyBill DECIMAL(10,2)
+-- Create ERCOTMaster table with matching column names
+CREATE TABLE ErcotMaster (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    address NVARCHAR(255) NOT NULL,
+    city NVARCHAR(100) NOT NULL,
+    state NVARCHAR(2) NOT NULL,
+    zip NVARCHAR(10) NOT NULL, 
+    ESIId NVARCHAR(50) NULL,
+    MeterType NVARCHAR(50) NULL,
+    PremiseType NVARCHAR(50) NULL
 );
 GO
 
 -- Create indexes for better performance
-CREATE INDEX IX_ERCOTMaster_Address ON ERCOTMaster (Address);
-CREATE INDEX IX_ERCOTMaster_ZipCode ON ERCOTMaster (ZipCode);
+CREATE INDEX IX_ErcotMaster_Address ON ErcotMaster (address);
+CREATE INDEX IX_ErcotMaster_Zip ON ErcotMaster (zip);
 GO
 
--- Insert some sample data
-INSERT INTO ERCOTMaster (Address, City, State, ZipCode, ESIId, MeterType, PremiseType)
+-- Insert some sample data with correct column names
+INSERT INTO ErcotMaster (address, city, state, zip, ESIId, MeterType, PremiseType)
 VALUES 
     ('123 Main St', 'Houston', 'TX', '77001', 'ESI123456', 'Smart', 'Commercial'),
     ('456 Oak Ave', 'Dallas', 'TX', '75001', 'ESI789012', 'Smart', 'Residential'),
     ('789 Pine Rd', 'Austin', 'TX', '73301', 'ESI345678', 'Standard', 'Commercial');
 GO 
 
-USE LeadGrid;
-GO
-
 -- Insert ERCOT Main Street search results
-INSERT INTO ERCOTMaster (Address, City, State, ZipCode)
+INSERT INTO ErcotMaster (address, city, state, zip)
 VALUES 
     ('5052 SAN JUANITA RD TIERRA LINDA MAIN STREET', 'RIO GRANDE CITY', 'TX', '78582'),
     ('466 SANTIAGO ST MAIN STREET ESTATES', 'LA FERIA', 'TX', '78559'),

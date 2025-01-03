@@ -1,29 +1,44 @@
 import { Entity, Column, PrimaryGeneratedColumn, Index } from 'typeorm';
-import { IsString, IsNotEmpty } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
 
 @Entity('ErcotMaster')
 export class ErcotMaster {
-  @PrimaryGeneratedColumn()
-  readonly id: number;
+  @PrimaryGeneratedColumn('identity')
+  id: number;
 
-  @Index()
-  @Column()
+  @Index('IX_ErcotMaster_Address')
+  @Column({ type: 'nvarchar', length: 255 })
   @IsString()
   @IsNotEmpty()
-  readonly address: string;
+  address: string;
 
-  @Column()
+  @Column({ type: 'nvarchar', length: 100 })
   @IsString()
   @IsNotEmpty()
-  readonly city: string;
+  city: string;
 
-  @Column()
+  @Column({ type: 'nvarchar', length: 2 })
   @IsString()
   @IsNotEmpty()
-  readonly state: string;
+  state: string;
 
-  @Column()
+  @Column({ type: 'nvarchar', length: 10 })
   @IsString()
   @IsNotEmpty()
-  readonly zip: string;
+  zip: string;
+
+  @Column({ type: 'nvarchar', length: 50, nullable: true })
+  @IsString()
+  @IsOptional()
+  ESIId?: string;
+
+  @Column({ type: 'nvarchar', length: 50, nullable: true })
+  @IsString()
+  @IsOptional()
+  MeterType?: string;
+
+  @Column({ type: 'nvarchar', length: 50, nullable: true })
+  @IsString()
+  @IsOptional()
+  PremiseType?: string;
 }
